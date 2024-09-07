@@ -2,55 +2,42 @@
 #include <string>
 using namespace std;
 
-
 class CurrencyConverter {
 private:
-    double dollar;      
-    string currency;    
+    double dollar;
+    string currency;
 
 public:
-    
     CurrencyConverter() {
-        dollar = 0;
-        currency = "";
+        this->dollar = 0;
+        this->currency = "";
     }
 
-    
     void setDollar(double amount) {
-        dollar = amount;
+        this->dollar = amount;
     }
 
-    
     void setCurrency(string curr) {
-        currency = curr;
+        this->currency = curr;
     }
 
-    
     void displayValues() {
-        cout << "Dollar: " << dollar << ", Currency: " << currency << endl;
+        cout << "Dollar: " << this->dollar << ", Currency: " << this->currency << endl;
     }
 };
 
-
 class UserInteraction {
 public:
-    
     void getInput() {
         cout << "Getting user input (this is just a placeholder for now)." << endl;
     }
 };
 
 int main() {
-    
     CurrencyConverter converter;
-
-    
     UserInteraction ui;
 
-    
     converter.displayValues();
-
-    
     ui.getInput();
 
     return 0;
