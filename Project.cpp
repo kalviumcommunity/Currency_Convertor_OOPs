@@ -79,6 +79,12 @@ public:
         cout << "Invalid currency code!\n";
     }
 
+    // Static function to get the conversion count
+    static int getConversionCount() {
+        return conversionCount;
+    }
+
+    // Static function to display conversion count
     static void displayConversionCount() {
         cout << "\nTotal conversions made: " << conversionCount << "\n";
     }
@@ -135,8 +141,11 @@ int main() {
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
     }
 
-    // Display total number of conversions using the static method
+    // Display total number of conversions using the static function
     CurrencyConverter::displayConversionCount();
+
+    // Example of using another static member function
+    cout << "Accessing static conversion count: " << CurrencyConverter::getConversionCount() << endl;
 
     cout << "Thank you for using the Currency Converter!\n";
 
