@@ -22,6 +22,7 @@ private:
     double dollar;
     string currency;
     Currency* currencies; // Dynamic array for currencies
+    static int conversionCount; // Static variable to keep track of conversions
 
 public:
     CurrencyConverter() {
@@ -60,6 +61,7 @@ public:
     double convert() {
         for (int i = 0; i < 6; i++) {
             if (currencies[i].code == this->currency) {
+                conversionCount++;  // Increment conversion count
                 return this->dollar * currencies[i].rate;
             }
         }
@@ -76,7 +78,14 @@ public:
         }
         cout << "Invalid currency code!\n";
     }
+
+    static void displayConversionCount() {
+        cout << "\nTotal conversions made: " << conversionCount << "\n";
+    }
 };
+
+// Initialize static variable
+int CurrencyConverter::conversionCount = 0;
 
 int main() {
     // Dynamic allocation for CurrencyConverter object
@@ -125,6 +134,9 @@ int main() {
         cin.clear();
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
     }
+
+    // Display total number of conversions using the static method
+    CurrencyConverter::displayConversionCount();
 
     cout << "Thank you for using the Currency Converter!\n";
 
