@@ -21,19 +21,27 @@ class CurrencyConverter {
 private:
     double dollar;
     string currency;
-    Currency currencies[6] = {
-        Currency("inr", 75.13),
-        Currency("gbp", 0.73),
-        Currency("eur", 0.86),
-        Currency("aud", 1.34),
-        Currency("jpy", 109.95),
-        Currency("cad", 1.25)
-    };
+    Currency* currencies; // Dynamic array for currencies
 
 public:
     CurrencyConverter() {
         this->dollar = 0;
         this->currency = "";
+
+        // Allocate dynamic memory for the array of 6 currencies
+        currencies = new Currency[6]{
+            Currency("inr", 75.13),
+            Currency("gbp", 0.73),
+            Currency("eur", 0.86),
+            Currency("aud", 1.34),
+            Currency("jpy", 109.95),
+            Currency("cad", 1.25)
+        };
+    }
+
+    ~CurrencyConverter() {
+        // Free dynamically allocated memory
+        delete[] currencies;
     }
 
     void setDollar(double amount) {
@@ -71,7 +79,8 @@ public:
 };
 
 int main() {
-    CurrencyConverter converter;
+    // Dynamic allocation for CurrencyConverter object
+    CurrencyConverter* converter = new CurrencyConverter();
     string currency;
     double dollar;
     char choice = 'y';
@@ -79,7 +88,7 @@ int main() {
     cout << "---- CURRENCY CONVERTER ----\n";
 
     while (choice == 'y' || choice == 'Y') {
-        
+
         bool validInput = false;
         while (!validInput) {
             cout << "\nEnter the amount in American Dollars (USD): ";
@@ -96,17 +105,17 @@ int main() {
             }
         }
 
-        converter.setDollar(dollar);
+        converter->setDollar(dollar);
 
         cout << "Enter currency code (INR, GBP, EUR, AUD, JPY, CAD): ";
         cin >> currency;
 
-        converter.setCurrency(currency);
+        converter->setCurrency(currency);
 
-        double result = converter.convert();
+        double result = converter->convert();
 
         if (result != -1) {
-            converter.displayResult(result);
+            converter->displayResult(result);
         } else {
             cout << "Invalid currency code entered!\n";
         }
@@ -118,5 +127,9 @@ int main() {
     }
 
     cout << "Thank you for using the Currency Converter!\n";
+
+    // Free dynamically allocated memory
+    delete converter;
+
     return 0;
 }
