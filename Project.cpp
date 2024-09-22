@@ -6,26 +6,21 @@
 
 using namespace std;
 
-// Class to represent a currency with code and rate
 class Currency {
 public:
-    string code;  // Currency code (like "inr", "usd")
-    double rate;  // Conversion rate to USD
+    string code;
+    double rate;
 
-    // Constructor to initialize currency code and rate
     Currency(string code = "", double rate = 0.0) {
-        this->code = code;  // Using 'this' pointer to refer to class members
-        this->rate = rate;  // 'this' refers to the current object
+        this->code = code;
+        this->rate = rate;
     }
 };
 
-// Class to convert dollars to different currencies
 class CurrencyConverter {
 private:
-    double dollar;  // Amount in USD
-    string currency;  // Chosen currency code
-    
-    // Array of Currency objects to store different currency rates
+    double dollar;
+    string currency;
     Currency currencies[6] = {
         Currency("inr", 75.13),
         Currency("gbp", 0.73),
@@ -36,57 +31,46 @@ private:
     };
 
 public:
-    // Constructor to initialize dollar and currency with default values
     CurrencyConverter() {
         this->dollar = 0;
         this->currency = "";
     }
 
-    // Function to set dollar value (input validation)
     void setDollar(double amount) {
         if (amount > 0) {
-            this->dollar = amount;  // 'this' pointer used to refer to class member
+            this->dollar = amount;
         } else {
             cout << "Invalid amount. Please enter a positive number.\n";
         }
     }
 
-    // Function to set currency code
     void setCurrency(string curr) {
-        // Convert input currency code to lowercase for consistency
         transform(curr.begin(), curr.end(), curr.begin(), ::tolower);
-        this->currency = curr;  // 'this' pointer used to refer to class member
+        this->currency = curr;
     }
 
-    // Function to convert USD to the chosen currency
     double convert() {
-        // Loop through the array of Currency objects to find the matching currency
         for (int i = 0; i < 6; i++) {
             if (currencies[i].code == this->currency) {
-                // Return the converted amount
                 return this->dollar * currencies[i].rate;
             }
         }
-        return -1;  // If the currency is not found, return -1
+        return -1;
     }
 
-    // Function to display the conversion result
     void displayResult(double result) {
-        cout << fixed << setprecision(2);  // Set output format to 2 decimal places
-        // Loop through the array to match the currency and display the result
+        cout << fixed << setprecision(2);
         for (int i = 0; i < 6; i++) {
             if (currencies[i].code == this->currency) {
-                // Display result in the correct format
                 cout << this->dollar << " Dollars = " << result << " in " << currencies[i].code << " (" << currencies[i].code << ")\n";
                 return;
             }
         }
-        cout << "Invalid currency code!\n";  // If currency code is invalid
+        cout << "Invalid currency code!\n";
     }
 };
 
 int main() {
-    // Create an object of the CurrencyConverter class
     CurrencyConverter converter;
     string currency;
     double dollar;
@@ -96,48 +80,42 @@ int main() {
 
     while (choice == 'y' || choice == 'Y') {
         
-        // Input validation for dollar amount
         bool validInput = false;
         while (!validInput) {
             cout << "\nEnter the amount in American Dollars (USD): ";
             cin >> dollar;
 
-            if (cin.fail()) {  // Check if the input is not a number
+            if (cin.fail()) {
                 cout << "Invalid input. Please enter a valid number.\n";
-                cin.clear();  // Clear the error state
-                cin.ignore(numeric_limits<streamsize>::max(), '\n');  // Ignore the invalid input
+                cin.clear();
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
             } else if (dollar <= 0) {
                 cout << "Invalid amount. Please enter a positive number.\n";
             } else {
-                validInput = true;  // Input is valid, exit the loop
+                validInput = true;
             }
         }
 
-        // Set the dollar amount in the converter object
         converter.setDollar(dollar);
 
-        // Input currency code
         cout << "Enter currency code (INR, GBP, EUR, AUD, JPY, CAD): ";
         cin >> currency;
 
-        // Set the currency code in the converter object
         converter.setCurrency(currency);
 
-        // Perform the currency conversion
         double result = converter.convert();
 
-        // Display the result if the currency is valid
         if (result != -1) {
             converter.displayResult(result);
         } else {
             cout << "Invalid currency code entered!\n";
         }
 
-        // Ask if the user wants to convert another amount
         cout << "\nDo you want to convert another amount? (Y/N): ";
-    }
         cin >> choice;
-        
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    }
 
     cout << "Thank you for using the Currency Converter!\n";
     return 0;
