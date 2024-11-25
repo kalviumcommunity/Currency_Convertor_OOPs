@@ -5,7 +5,7 @@
 
 using namespace std;
 
-// Base class definition (for the concept of inheritance)
+// Base class definition (for the concept of inheritance and polymorphism)
 class Converter {
 protected:
     double dollar;        // Protected members accessible in derived class
@@ -18,12 +18,12 @@ public:
         currency = "";
     }
 
-    // Virtual method to perform conversion (to be overridden by derived class)
+    // Virtual method to perform conversion (enables runtime polymorphism)
     virtual double convert() {
-        return 0;
+        return 0; // Default implementation
     }
 
-    // Virtual destructor
+    // Virtual destructor (important for polymorphism to ensure proper cleanup)
     virtual ~Converter() {
         // Destructor logic (if needed in future)
     }
@@ -59,7 +59,7 @@ public:
         currency = curr;
     }
 
-    // Override the convert function from the base class
+    // Override the convert function from the base class (polymorphism concept)
     double convert() override {
         if (currency == "inr") {
             return dollar * INR;
@@ -100,7 +100,8 @@ public:
 };
 
 int main() {
-    CurrencyConverter converter;
+    // Polymorphism in action: Base class pointer pointing to derived class object
+    Converter* converter = new CurrencyConverter();
     string currency;
     double dollar;
     char choice = 'y';
@@ -112,22 +113,22 @@ int main() {
         cout << "\nEnter the amount in American Dollars (USD): ";
         cin >> dollar;
 
-        // Setting the dollar amount in the object with validation
-        converter.setDollar(dollar);
+        // Downcast to call derived class method
+        dynamic_cast<CurrencyConverter*>(converter)->setDollar(dollar);
 
         // Input currency code
         cout << "Enter currency code (INR, GBP, EUR, AUD, JPY, CAD): ";
         cin >> currency;
 
-        // Set the currency in the object
-        converter.setCurrency(currency);
+        // Downcast to call derived class method
+        dynamic_cast<CurrencyConverter*>(converter)->setCurrency(currency);
 
-        // Perform the conversion
-        double result = converter.convert();
+        // Perform the conversion using polymorphism
+        double result = converter->convert();
 
         // Display the result if the conversion was valid
         if (result != -1) {
-            converter.displayResult(result);
+            dynamic_cast<CurrencyConverter*>(converter)->displayResult(result);
         } else {
             cout << "Invalid currency code entered!\n";
         }
@@ -138,5 +139,9 @@ int main() {
     }
 
     cout << "Thank you for using the Currency Converter!\n";
+
+    // Freeing memory allocated for the base class pointer
+    delete converter;
+
     return 0;
 }
