@@ -1,11 +1,11 @@
 #include <iostream>
-#include <iomanip> 
+#include <iomanip>
 #include <string>
-#include <algorithm> 
+#include <algorithm>
 
 using namespace std;
 
-// Base class definition (for the concept of inheritance and polymorphism)
+// Abstract Base Class (introducing the concept of abstract class)
 class Converter {
 protected:
     double dollar;        // Protected members accessible in derived class
@@ -18,18 +18,16 @@ public:
         currency = "";
     }
 
-    // Virtual method to perform conversion (enables runtime polymorphism)
-    virtual double convert() {
-        return 0; // Default implementation
-    }
+    // Pure virtual function to make this an abstract class
+    virtual double convert() = 0;
 
-    // Virtual destructor (important for polymorphism to ensure proper cleanup)
+    // Virtual destructor to ensure proper cleanup in polymorphic usage
     virtual ~Converter() {
         // Destructor logic (if needed in future)
     }
 };
 
-// Derived class CurrencyConverter inherits from base class Converter
+// Derived class CurrencyConverter inherits from abstract class Converter
 class CurrencyConverter : public Converter {
 private:
     // Exchange rates (private and hidden from the user)
@@ -59,7 +57,7 @@ public:
         currency = curr;
     }
 
-    // Override the convert function from the base class (polymorphism concept)
+    // Override the pure virtual function from the base class
     double convert() override {
         if (currency == "inr") {
             return dollar * INR;
@@ -120,7 +118,7 @@ int main() {
         cout << "Enter currency code (INR, GBP, EUR, AUD, JPY, CAD): ";
         cin >> currency;
 
-        // Downcast to call derived class method
+        // Set the currency in the object
         dynamic_cast<CurrencyConverter*>(converter)->setCurrency(currency);
 
         // Perform the conversion using polymorphism
