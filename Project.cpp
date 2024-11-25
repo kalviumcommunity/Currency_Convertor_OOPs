@@ -1,101 +1,106 @@
 #include <iostream>
 #include <iomanip> 
 #include <string>
-#include <algorithm>
-#include <limits>
+#include <algorithm> 
 
 using namespace std;
 
-class Currency {
-public:
-    string code;
-    double rate;
+// Base class definition (for the concept of inheritance)
+class Converter {
+protected:
+    double dollar;        // Protected members accessible in derived class
+    string currency;      // Protected members accessible in derived class
 
-    Currency(string code = "", double rate = 0.0) {
-        this->code = code;
-        this->rate = rate;
+public:
+    // Constructor for base class
+    Converter() {
+        dollar = 0;
+        currency = "";
+    }
+
+    // Virtual method to perform conversion (to be overridden by derived class)
+    virtual double convert() {
+        return 0;
+    }
+
+    // Virtual destructor
+    virtual ~Converter() {
+        // Destructor logic (if needed in future)
     }
 };
 
-class CurrencyConverter {
+// Derived class CurrencyConverter inherits from base class Converter
+class CurrencyConverter : public Converter {
 private:
-    double dollar;
-    string currency;
-    Currency* currencies; // Dynamic array for currencies
-    static int conversionCount; // Static variable to keep track of conversions
+    // Exchange rates (private and hidden from the user)
+    const double GBP = 0.73;
+    const double EUR = 0.86;
+    const double INR = 75.13;
+    const double AUD = 1.34;
+    const double JPY = 109.95;
+    const double CAD = 1.25;
 
 public:
-    CurrencyConverter() {
-        this->dollar = 0;
-        this->currency = "";
+    // Constructor for derived class
+    CurrencyConverter() : Converter() {}
 
-        // Allocate dynamic memory for the array of 6 currencies
-        currencies = new Currency[6]{
-            Currency("inr", 75.13),
-            Currency("gbp", 0.73),
-            Currency("eur", 0.86),
-            Currency("aud", 1.34),
-            Currency("jpy", 109.95),
-            Currency("cad", 1.25)
-        };
-    }
-
-    ~CurrencyConverter() {
-        // Free dynamically allocated memory
-        delete[] currencies;
-    }
-
+    // Setter for dollar amount (input validation inside the setter)
     void setDollar(double amount) {
         if (amount > 0) {
-            this->dollar = amount;
+            dollar = amount;
         } else {
             cout << "Invalid amount. Please enter a positive number.\n";
         }
     }
 
+    // Setter for currency (input transformed to lowercase)
     void setCurrency(string curr) {
         transform(curr.begin(), curr.end(), curr.begin(), ::tolower);
-        this->currency = curr;
+        currency = curr;
     }
 
-    double convert() {
-        for (int i = 0; i < 6; i++) {
-            if (currencies[i].code == this->currency) {
-                conversionCount++;  // Increment conversion count
-                return this->dollar * currencies[i].rate;
-            }
+    // Override the convert function from the base class
+    double convert() override {
+        if (currency == "inr") {
+            return dollar * INR;
+        } else if (currency == "eur") {
+            return dollar * EUR;
+        } else if (currency == "gbp") {
+            return dollar * GBP;
+        } else if (currency == "aud") {
+            return dollar * AUD;
+        } else if (currency == "jpy") {
+            return dollar * JPY;
+        } else if (currency == "cad") {
+            return dollar * CAD;
+        } else {
+            return -1;  // Invalid currency code
         }
-        return -1;
     }
 
+    // Method to display the result based on the selected currency
     void displayResult(double result) {
         cout << fixed << setprecision(2);
-        for (int i = 0; i < 6; i++) {
-            if (currencies[i].code == this->currency) {
-                cout << this->dollar << " Dollars = " << result << " in " << currencies[i].code << " (" << currencies[i].code << ")\n";
-                return;
-            }
+        if (currency == "inr") {
+            cout << dollar << " Dollars = " << result << " Indian Rupees (INR)\n";
+        } else if (currency == "eur") {
+            cout << dollar << " Dollars = " << result << " Euros (EUR)\n";
+        } else if (currency == "gbp") {
+            cout << dollar << " Dollars = " << result << " British Pounds (GBP)\n";
+        } else if (currency == "aud") {
+            cout << dollar << " Dollars = " << result << " Australian Dollars (AUD)\n";
+        } else if (currency == "jpy") {
+            cout << dollar << " Dollars = " << result << " Japanese Yen (JPY)\n";
+        } else if (currency == "cad") {
+            cout << dollar << " Dollars = " << result << " Canadian Dollars (CAD)\n";
+        } else {
+            cout << "Invalid currency code!\n";
         }
-        cout << "Invalid currency code!\n";
-    }
-
-    // Static function to get the conversion count
-    static int getConversionCount() {
-        return conversionCount;
-    }
-
-    // Static function to display conversion count
-    static void displayConversionCount() {
-        cout << "\nTotal conversions made: " << conversionCount << "\n";
     }
 };
 
-// Initialize static variable
-int CurrencyConverter::conversionCount = 0;
-
 int main() {
-    // Dynamic allocation for CurrencyConverter object
-    CurrencyConverter* converter = new CurrencyConverter();
+    CurrencyConverter converter;
     string currency;
     double dollar;
     char choice = 'y';
@@ -103,54 +108,35 @@ int main() {
     cout << "---- CURRENCY CONVERTER ----\n";
 
     while (choice == 'y' || choice == 'Y') {
+        
+        cout << "\nEnter the amount in American Dollars (USD): ";
+        cin >> dollar;
 
-        bool validInput = false;
-        while (!validInput) {
-            cout << "\nEnter the amount in American Dollars (USD): ";
-            cin >> dollar;
+        // Setting the dollar amount in the object with validation
+        converter.setDollar(dollar);
 
-            if (cin.fail()) {
-                cout << "Invalid input. Please enter a valid number.\n";
-                cin.clear();
-                cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            } else if (dollar <= 0) {
-                cout << "Invalid amount. Please enter a positive number.\n";
-            } else {
-                validInput = true;
-            }
-        }
-
-        converter->setDollar(dollar);
-
+        // Input currency code
         cout << "Enter currency code (INR, GBP, EUR, AUD, JPY, CAD): ";
         cin >> currency;
 
-        converter->setCurrency(currency);
+        // Set the currency in the object
+        converter.setCurrency(currency);
 
-        double result = converter->convert();
+        // Perform the conversion
+        double result = converter.convert();
 
+        // Display the result if the conversion was valid
         if (result != -1) {
-            converter->displayResult(result);
+            converter.displayResult(result);
         } else {
             cout << "Invalid currency code entered!\n";
         }
 
+        // Ask if the user wants to convert another amount
         cout << "\nDo you want to convert another amount? (Y/N): ";
         cin >> choice;
-        cin.clear();
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
     }
 
-    // Display total number of conversions using the static function
-    CurrencyConverter::displayConversionCount();
-
-    // Example of using another static member function
-    cout << "Accessing static conversion count: " << CurrencyConverter::getConversionCount() << endl;
-
     cout << "Thank you for using the Currency Converter!\n";
-
-    // Free dynamically allocated memory
-    delete converter;
-
     return 0;
 }
