@@ -42,18 +42,13 @@ public:
     // Constructor for derived class
     CurrencyConverter() : Converter() {}
 
-    // Setter for dollar amount (input validation inside the setter)
+    // Setter for dollar amount
     void setDollar(double amount) {
-        if (amount > 0) {
-            dollar = amount;
-        } else {
-            cout << "Invalid amount. Please enter a positive number.\n";
-        }
+        dollar = amount;
     }
 
-    // Setter for currency (input transformed to lowercase)
+    // Setter for currency
     void setCurrency(string curr) {
-        transform(curr.begin(), curr.end(), curr.begin(), ::tolower);
         currency = curr;
     }
 
@@ -75,9 +70,31 @@ public:
             return -1;  // Invalid currency code
         }
     }
+};
 
-    // Method to display the result based on the selected currency
-    void displayResult(double result) {
+// Class for handling user interaction
+class UserInterface {
+public:
+    static double getDollarAmount() {
+        double dollar;
+        cout << "\nEnter the amount in American Dollars (USD): ";
+        cin >> dollar;
+        if (dollar <= 0) {
+            cout << "Invalid amount. Please enter a positive number.\n";
+            return getDollarAmount(); // Recursive call for valid input
+        }
+        return dollar;
+    }
+
+    static string getCurrencyCode() {
+        string currency;
+        cout << "Enter currency code (INR, GBP, EUR, AUD, JPY, CAD): ";
+        cin >> currency;
+        transform(currency.begin(), currency.end(), currency.begin(), ::tolower);
+        return currency;
+    }
+
+    static void displayResult(double dollar, const string& currency, double result) {
         cout << fixed << setprecision(2);
         if (currency == "inr") {
             cout << dollar << " Dollars = " << result << " Indian Rupees (INR)\n";
@@ -100,25 +117,16 @@ public:
 int main() {
     // Polymorphism in action: Base class pointer pointing to derived class object
     Converter* converter = new CurrencyConverter();
-    string currency;
-    double dollar;
     char choice = 'y';
 
     cout << "---- CURRENCY CONVERTER ----\n";
 
     while (choice == 'y' || choice == 'Y') {
-        
-        cout << "\nEnter the amount in American Dollars (USD): ";
-        cin >> dollar;
+        double dollar = UserInterface::getDollarAmount();
+        string currency = UserInterface::getCurrencyCode();
 
-        // Downcast to call derived class method
+        // Downcast to call derived class methods
         dynamic_cast<CurrencyConverter*>(converter)->setDollar(dollar);
-
-        // Input currency code
-        cout << "Enter currency code (INR, GBP, EUR, AUD, JPY, CAD): ";
-        cin >> currency;
-
-        // Set the currency in the object
         dynamic_cast<CurrencyConverter*>(converter)->setCurrency(currency);
 
         // Perform the conversion using polymorphism
@@ -126,7 +134,7 @@ int main() {
 
         // Display the result if the conversion was valid
         if (result != -1) {
-            dynamic_cast<CurrencyConverter*>(converter)->displayResult(result);
+            UserInterface::displayResult(dollar, currency, result);
         } else {
             cout << "Invalid currency code entered!\n";
         }
