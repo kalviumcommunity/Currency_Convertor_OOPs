@@ -18,8 +18,26 @@ public:
         currency = "";
     }
 
+    // Setter for dollar amount (defined in the base class to adhere to LSP)
+    virtual void setDollar(double amount) {
+        if (amount > 0) {
+            dollar = amount;
+        } else {
+            cout << "Invalid amount. Please enter a positive number.\n";
+        }
+    }
+
+    // Setter for currency (defined in the base class to adhere to LSP)
+    virtual void setCurrency(string curr) {
+        transform(curr.begin(), curr.end(), curr.begin(), ::tolower);
+        currency = curr;
+    }
+
     // Pure virtual function to make this an abstract class
     virtual double convert() = 0;
+
+    // Virtual function to display the result
+    virtual void displayResult(double result) const = 0;
 
     // Virtual destructor to ensure proper cleanup in polymorphic usage
     virtual ~Converter() {
@@ -42,21 +60,6 @@ public:
     // Constructor for derived class
     CurrencyConverter() : Converter() {}
 
-    // Setter for dollar amount (input validation inside the setter)
-    void setDollar(double amount) {
-        if (amount > 0) {
-            dollar = amount;
-        } else {
-            cout << "Invalid amount. Please enter a positive number.\n";
-        }
-    }
-
-    // Setter for currency (input transformed to lowercase)
-    void setCurrency(string curr) {
-        transform(curr.begin(), curr.end(), curr.begin(), ::tolower);
-        currency = curr;
-    }
-
     // Override the pure virtual function from the base class
     double convert() override {
         if (currency == "inr") {
@@ -76,8 +79,8 @@ public:
         }
     }
 
-    // Method to display the result based on the selected currency
-    void displayResult(double result) {
+    // Override the virtual function to display the result
+    void displayResult(double result) const override {
         cout << fixed << setprecision(2);
         if (currency == "inr") {
             cout << dollar << " Dollars = " << result << " Indian Rupees (INR)\n";
@@ -111,22 +114,22 @@ int main() {
         cout << "\nEnter the amount in American Dollars (USD): ";
         cin >> dollar;
 
-        // Downcast to call derived class method
-        dynamic_cast<CurrencyConverter*>(converter)->setDollar(dollar);
+        // Call base class method (overridden in the derived class)
+        converter->setDollar(dollar);
 
         // Input currency code
         cout << "Enter currency code (INR, GBP, EUR, AUD, JPY, CAD): ";
         cin >> currency;
 
         // Set the currency in the object
-        dynamic_cast<CurrencyConverter*>(converter)->setCurrency(currency);
+        converter->setCurrency(currency);
 
         // Perform the conversion using polymorphism
         double result = converter->convert();
 
         // Display the result if the conversion was valid
         if (result != -1) {
-            dynamic_cast<CurrencyConverter*>(converter)->displayResult(result);
+            converter->displayResult(result);
         } else {
             cout << "Invalid currency code entered!\n";
         }
