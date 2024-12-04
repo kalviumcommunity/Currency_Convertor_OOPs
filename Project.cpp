@@ -2,7 +2,6 @@
 #include <iomanip>
 #include <string>
 #include <algorithm>
-#include <map>
 
 using namespace std;
 
@@ -46,78 +45,35 @@ public:
     }
 };
 
-// New abstract base class for currencies
-class CurrencyConversionStrategy {
-public:
-    virtual double getConversionRate() const = 0; // Pure virtual function for the rate
-    virtual string getCurrencyName() const = 0;  // Pure virtual function for currency name
-    virtual ~CurrencyConversionStrategy() {}
-};
-
-// Concrete Currency Strategy Classes
-class INRConversion : public CurrencyConversionStrategy {
-public:
-    double getConversionRate() const override { return 75.13; }
-    string getCurrencyName() const override { return "Indian Rupees (INR)"; }
-};
-
-class EURConversion : public CurrencyConversionStrategy {
-public:
-    double getConversionRate() const override { return 0.86; }
-    string getCurrencyName() const override { return "Euros (EUR)"; }
-};
-
-class GBPConversion : public CurrencyConversionStrategy {
-public:
-    double getConversionRate() const override { return 0.73; }
-    string getCurrencyName() const override { return "British Pounds (GBP)"; }
-};
-
-class AUDConversion : public CurrencyConversionStrategy {
-public:
-    double getConversionRate() const override { return 1.34; }
-    string getCurrencyName() const override { return "Australian Dollars (AUD)"; }
-};
-
-class JPYConversion : public CurrencyConversionStrategy {
-public:
-    double getConversionRate() const override { return 109.95; }
-    string getCurrencyName() const override { return "Japanese Yen (JPY)"; }
-};
-
-class CADConversion : public CurrencyConversionStrategy {
-public:
-    double getConversionRate() const override { return 1.25; }
-    string getCurrencyName() const override { return "Canadian Dollars (CAD)"; }
-};
-
 // Derived class CurrencyConverter inherits from abstract class Converter
 class CurrencyConverter : public Converter {
 private:
-    map<string, CurrencyConversionStrategy*> strategies; // Map for strategies
+    // Exchange rates (private and hidden from the user)
+    const double GBP = 0.73;
+    const double EUR = 0.86;
+    const double INR = 75.13;
+    const double AUD = 1.34;
+    const double JPY = 109.95;
+    const double CAD = 1.25;
 
 public:
     // Constructor for derived class
-    CurrencyConverter() : Converter() {
-        strategies["inr"] = new INRConversion();
-        strategies["eur"] = new EURConversion();
-        strategies["gbp"] = new GBPConversion();
-        strategies["aud"] = new AUDConversion();
-        strategies["jpy"] = new JPYConversion();
-        strategies["cad"] = new CADConversion();
-    }
-
-    // Destructor to clean up dynamically allocated strategies
-    ~CurrencyConverter() {
-        for (auto& strategy : strategies) {
-            delete strategy.second;
-        }
-    }
+    CurrencyConverter() : Converter() {}
 
     // Override the pure virtual function from the base class
     double convert() override {
-        if (strategies.find(currency) != strategies.end()) {
-            return dollar * strategies[currency]->getConversionRate();
+        if (currency == "inr") {
+            return dollar * INR;
+        } else if (currency == "eur") {
+            return dollar * EUR;
+        } else if (currency == "gbp") {
+            return dollar * GBP;
+        } else if (currency == "aud") {
+            return dollar * AUD;
+        } else if (currency == "jpy") {
+            return dollar * JPY;
+        } else if (currency == "cad") {
+            return dollar * CAD;
         } else {
             return -1;  // Invalid currency code
         }
@@ -126,8 +82,18 @@ public:
     // Override the virtual function to display the result
     void displayResult(double result) const override {
         cout << fixed << setprecision(2);
-        if (strategies.find(currency) != strategies.end()) {
-            cout << dollar << " Dollars = " << result << " " << strategies[currency]->getCurrencyName() << "\n";
+        if (currency == "inr") {
+            cout << dollar << " Dollars = " << result << " Indian Rupees (INR)\n";
+        } else if (currency == "eur") {
+            cout << dollar << " Dollars = " << result << " Euros (EUR)\n";
+        } else if (currency == "gbp") {
+            cout << dollar << " Dollars = " << result << " British Pounds (GBP)\n";
+        } else if (currency == "aud") {
+            cout << dollar << " Dollars = " << result << " Australian Dollars (AUD)\n";
+        } else if (currency == "jpy") {
+            cout << dollar << " Dollars = " << result << " Japanese Yen (JPY)\n";
+        } else if (currency == "cad") {
+            cout << dollar << " Dollars = " << result << " Canadian Dollars (CAD)\n";
         } else {
             cout << "Invalid currency code!\n";
         }
@@ -144,6 +110,7 @@ int main() {
     cout << "---- CURRENCY CONVERTER ----\n";
 
     while (choice == 'y' || choice == 'Y') {
+        
         cout << "\nEnter the amount in American Dollars (USD): ";
         cin >> dollar;
 
